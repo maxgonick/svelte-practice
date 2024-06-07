@@ -1,6 +1,15 @@
-<script>
+<script lang="ts">
 	import enterSvg from '$lib/assets/enter.svg';
+	import { goto } from '$app/navigation';
+	const handleKeyDown = (e: KeyboardEvent): void => {
+		if (e.key !== 'Enter') {
+			return;
+		}
+		goto('/game');
+	};
 </script>
+
+<svelte:window on:keydown={handleKeyDown} />
 
 <main>
 	<div class="title">tic tac toe</div>
