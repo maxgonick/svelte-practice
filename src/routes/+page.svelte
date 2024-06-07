@@ -38,11 +38,12 @@
 		gap: 1rem;
 		display: flex;
 		margin-top: 5%;
+		align-items: center;
 	}
 	.playButton {
 		justify-self: center;
 		background-color: rgba(146, 64, 14, 0.5);
-		border: rgb(146 64 14);
+		border: 0.5px solid rgb(146 64 14);
 		border-radius: 12px;
 		padding: 0.5rem 1rem;
 		color: white;
