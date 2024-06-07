@@ -1,7 +1,6 @@
 <script lang="ts">
 	import xSvg from '$lib/assets/x.svg';
-	import ySvg from '$lib/assets/o.svg';
-	import { tick } from 'svelte';
+	import oSvg from '$lib/assets/o.svg';
 	let playerTurn = true;
 
 	let board: number[][] = [
@@ -16,7 +15,7 @@
 		[false, false, false]
 	];
 
-	const handleClick = (row: number, col: number, e: Event): void => {
+	const handleClick = (row: number, col: number): void => {
 		board[row][col] = playerTurn ? 0 : 1;
 		board = board;
 		playerTurn = !playerTurn;
@@ -31,9 +30,8 @@
 	const handleMouseLeave = (row: number, col: number): void => {
 		if (board[row][col] !== -1) return;
 		hoverMap[row][col] = false;
-		hoverMap = hoverMap
-	}
-
+		hoverMap = hoverMap;
+	};
 </script>
 
 <div class="board-wrapper">
@@ -44,8 +42,8 @@
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					class="cell"
-					on:click|stopPropagation={(e: Event) => {
-						handleClick(row, col, e);
+					on:click|stopPropagation={() => {
+						handleClick(row, col);
 					}}
 					on:mouseenter|stopPropagation={() => {
 						handleMouseEnter(row, col);
@@ -55,13 +53,12 @@
 					}}
 					on:focus={() => {}}
 				>
-					<!-- {#if board[row][col] === 0}
+					{#if board[row][col] === 0}
 						<img src={xSvg} alt="icon" />
 					{:else if board[row][col] === 1}
-						<img src={ySvg} alt="icon" />
-					{/if} -->
-					{#if hoverMap[row][col] === true}
-						<img src={playerTurn ? xSvg : ySvg} alt="icon" style="opacity: 0.75;" />
+						<img src={oSvg} alt="icon" />
+					{:else if hoverMap[row][col] === true}
+						<img src={playerTurn ? xSvg : oSvg} alt="icon" style="opacity: 0.75;" />
 					{/if}
 				</div>
 			{/each}
