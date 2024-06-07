@@ -1,8 +1,10 @@
 <script lang="ts">
 	import xSvg from '$lib/assets/x.svg';
 	import oSvg from '$lib/assets/o.svg';
-	let playerTurn = true;
+	import type { Writable } from 'svelte/store';
 
+	export let playerTurn: Writable<boolean>;
+	export let record: Writable<number[]>;
 	let board: number[][] = [
 		[-1, -1, -1],
 		[-1, -1, -1],
@@ -16,9 +18,10 @@
 	];
 
 	const handleClick = (row: number, col: number): void => {
-		board[row][col] = playerTurn ? 0 : 1;
+		if (board[row][col] !== -1) return;
+		board[row][col] = $playerTurn ? 0 : 1;
 		board = board;
-		playerTurn = !playerTurn;
+		playerTurn.set(!$playerTurn);
 	};
 
 	const handleMouseEnter = (row: number, col: number): void => {
@@ -32,6 +35,42 @@
 		hoverMap[row][col] = false;
 		hoverMap = hoverMap;
 	};
+
+	const getVerticalSlices = (arr: number[][]): number[][] => {
+		return arr[0].map((_, colIndex) => arr.map((row) => row[colIndex]));
+	};
+	const checkForWin = (board: number[][]): void => {
+		//Check for Horizontal Wins
+		for (const row of board) {
+			if (row[0] !== -1 && row.every((val) => val == row[0])) {
+				record.update((n) => {
+					n[row[0]] += 1;
+					return n;
+				});
+			}
+		}
+		//Check for Vertical Wins
+		for (const col of getVerticalSlices(board)) {
+			if (col[0] !== -1 && col.every((val) => val == col[0])) {
+				record.update((n) => {
+					n[col[0]] += 1;
+					return n;
+				});
+			}
+		}
+		//Check Diagonal Wins
+		if (
+			(board[0][0] === board[1][1] && board[1][1] == board[2][2]) ||
+			(board[0][2] == board[1][1] && board[1][1] == board[2][0])
+		) {
+			record.update((n) => {
+				n[board[1][1]] += 1;
+				return n;
+			});
+		}
+	};
+
+	$: checkForWin(board);
 </script>
 
 <div class="board-wrapper">
@@ -58,7 +97,7 @@
 					{:else if board[row][col] === 1}
 						<img src={oSvg} alt="icon" />
 					{:else if hoverMap[row][col] === true}
-						<img src={playerTurn ? xSvg : oSvg} alt="icon" style="opacity: 0.75;" />
+						<img src={$playerTurn ? xSvg : oSvg} alt="icon" style="opacity: 0.75;" />
 					{/if}
 				</div>
 			{/each}
@@ -85,6 +124,10 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	.cell:hover {
+		cursor: pointer;
 	}
 
 	.border {
