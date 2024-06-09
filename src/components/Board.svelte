@@ -2,9 +2,14 @@
 	import xSvg from '$lib/assets/x.svg';
 	import oSvg from '$lib/assets/o.svg';
 	import type { Writable } from 'svelte/store';
-
+	enum Winner {
+		No = 0,
+		Player = 1,
+		Computer = 2
+	}
 	export let playerTurn: Writable<boolean>;
 	export let record: Writable<number[]>;
+	export let winnerStore: Writable<Winner>;
 	let board: number[][] = [
 		[-1, -1, -1],
 		[-1, -1, -1],
@@ -32,11 +37,9 @@
 	};
 
 	const handleClick = (row: number, col: number): void => {
-		board.forEach((v) => console.log(...v));
 		if (board[row][col] !== -1) return;
 		board[row][col] = $playerTurn ? 0 : 1;
 		board = board;
-		playerTurn.set(!$playerTurn);
 	};
 
 	const handleMouseEnter = (row: number, col: number): void => {
@@ -56,6 +59,18 @@
 		return arr[0].map((_, colIndex) => arr.map((row) => row[colIndex]));
 	};
 	const checkForWin = (board: number[][]): void => {
+		if (
+			board.every((arr: number[]) => {
+				return arr.every((val: number) => {
+					return val != -1;
+				});
+			})
+		) {
+			resetBoard();
+			playerTurn.set(true);
+			return;
+		}
+
 		//Check for Horizontal Wins
 		for (const [index, row] of board.entries()) {
 			if (row[0] !== -1 && row.every((val) => val == row[0])) {
@@ -63,7 +78,10 @@
 					n[row[0]] += 1;
 					return n;
 				});
+				winnerStore.set($playerTurn ? Winner.Player : Winner.Computer);
 				resetBoard();
+				playerTurn.set(!$playerTurn);
+				return;
 			}
 		}
 		//Check for Vertical Wins
@@ -73,7 +91,10 @@
 					n[col[0]] += 1;
 					return n;
 				});
+				winnerStore.set($playerTurn ? Winner.Player : Winner.Computer);
 				resetBoard();
+				playerTurn.set(!$playerTurn);
+				return;
 			}
 		}
 		//Check Diagonal Wins
@@ -86,8 +107,13 @@
 				n[board[1][1]] += 1;
 				return n;
 			});
+			winnerStore.set($playerTurn ? Winner.Player : Winner.Computer);
 			resetBoard();
+			playerTurn.set(!$playerTurn);
+			return;
 		}
+		playerTurn.set(!$playerTurn);
+		winnerStore.set(Winner.No);
 	};
 
 	$: checkForWin(board);

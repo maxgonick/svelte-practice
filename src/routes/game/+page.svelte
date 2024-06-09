@@ -5,6 +5,14 @@
 
 	const playerTurn: Writable<boolean> = writable(true);
 	const record: Writable<number[]> = writable([0, 0]);
+
+	enum Winner {
+		No = 0,
+		Player = 1,
+		Computer = 2
+	}
+
+	const winnerStore: Writable<Winner> = writable(Winner.No);
 </script>
 
 <div class="main">
@@ -48,13 +56,17 @@
 	</nav>
 	<div class="body">
 		<div class="turn">
-			{#if $playerTurn}
-				Your Turn
-			{:else}
+			{#if $winnerStore === Winner.Player}
+				Player Wins!
+			{:else if $winnerStore === Winner.Computer}
 				Opponent Turn
+			{:else if $playerTurn === true}
+				Player Turn
+			{:else}
+				Computer Turn
 			{/if}
 		</div>
-		<Board {playerTurn} {record} />
+		<Board {playerTurn} {record} {winnerStore} />
 	</div>
 </div>
 
