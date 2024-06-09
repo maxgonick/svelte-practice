@@ -17,7 +17,22 @@
 		[false, false, false]
 	];
 
+	const resetBoard = (): void => {
+		board = [
+			[-1, -1, -1],
+			[-1, -1, -1],
+			[-1, -1, -1]
+		];
+		hoverMap = [
+			[false, false, false],
+			[false, false, false],
+			[false, false, false]
+		];
+		return;
+	};
+
 	const handleClick = (row: number, col: number): void => {
+		board.forEach((v) => console.log(...v));
 		if (board[row][col] !== -1) return;
 		board[row][col] = $playerTurn ? 0 : 1;
 		board = board;
@@ -37,16 +52,18 @@
 	};
 
 	const getVerticalSlices = (arr: number[][]): number[][] => {
+		//
 		return arr[0].map((_, colIndex) => arr.map((row) => row[colIndex]));
 	};
 	const checkForWin = (board: number[][]): void => {
 		//Check for Horizontal Wins
-		for (const row of board) {
+		for (const [index, row] of board.entries()) {
 			if (row[0] !== -1 && row.every((val) => val == row[0])) {
 				record.update((n) => {
 					n[row[0]] += 1;
 					return n;
 				});
+				resetBoard();
 			}
 		}
 		//Check for Vertical Wins
@@ -56,17 +73,20 @@
 					n[col[0]] += 1;
 					return n;
 				});
+				resetBoard();
 			}
 		}
 		//Check Diagonal Wins
 		if (
-			(board[0][0] === board[1][1] && board[1][1] == board[2][2]) ||
-			(board[0][2] == board[1][1] && board[1][1] == board[2][0])
+			board[1][1] !== -1 &&
+			((board[0][0] === board[1][1] && board[1][1] === board[2][2]) ||
+				(board[0][2] === board[1][1] && board[1][1] === board[2][0]))
 		) {
 			record.update((n) => {
 				n[board[1][1]] += 1;
 				return n;
 			});
+			resetBoard();
 		}
 	};
 
